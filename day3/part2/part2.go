@@ -90,5 +90,6 @@ func main() {
 		}
 	}
 
+	// add two because step counts dont include the one step from 0,0 on either wire
 	fmt.Println(minSteps + 2)
 }
