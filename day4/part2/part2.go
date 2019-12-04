@@ -34,9 +34,7 @@ func checkDupe(digits []string) bool {
 		}
 
 		if count > 0 {
-			// the count only looks forward, if it matches once that meants there were 2 dupes etc
-			count++
-			if count <= 2 {
+			if count == 1 {
 				return true
 			}
 			i = j
