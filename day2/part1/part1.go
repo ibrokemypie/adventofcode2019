@@ -1,10 +1,11 @@
 package main
 
 import (
-	"bufio"
 	"fmt"
+	"io/ioutil"
 	"os"
 	"strconv"
+	"strings"
 )
 
 func main() {
@@ -14,31 +15,23 @@ func main() {
 	}
 	inputPath := os.Args[1]
 
-	file, err := os.Open(inputPath)
+	content, err := ioutil.ReadFile(inputPath)
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
 	}
 
-	defer file.Close()
-
 	var intcode []int
-	scanner := bufio.NewScanner(file)
-	scanner.Split(bufio.ScanRunes)
+	fileString := string(content)
+	intCodeStrings := strings.Split(strings.TrimSpace(fileString), ",")
 
-	// read comma separated opcodes into slice
-	for scanner.Scan() {
-		var data string
-		for scanner.Text() != "," && scanner.Text() != "\n" {
-			data += scanner.Text()
-			scanner.Scan()
-		}
-		num, err := strconv.Atoi(data)
+	for i := 0; i < len(intCodeStrings); i++ {
+		number, err := strconv.Atoi(intCodeStrings[i])
 		if err != nil {
 			fmt.Println(err)
 			os.Exit(1)
 		}
-		intcode = append(intcode, num)
+		intcode = append(intcode, number)
 	}
 
 	// apply challenge corrections
@@ -70,6 +63,5 @@ func main() {
 			}
 		}
 	}
-
 	fmt.Println("Value of pos 0: " + strconv.Itoa(intcode[0]))
 }
