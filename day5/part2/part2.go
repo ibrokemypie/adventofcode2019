@@ -80,10 +80,7 @@ L:
 			panic("incorrect output: " + strconv.Itoa(lastOutput))
 		}
 
-		if i >= len(intcode)-6 {
-			continue
-		}
-		fmt.Println(i)
+		// fmt.Println(i)
 
 		valueOne, valueTwo := getValues(i, intcode, modeOne, modeTwo)
 
@@ -97,7 +94,7 @@ L:
 				sum := valueOne + valueTwo
 				intcode[outputPos] = sum
 				i += 4
-				fmt.Println(strconv.Itoa(instruction) + ": add " + strconv.Itoa(valueOne) + " and " + strconv.Itoa(valueTwo) + " output to position " + strconv.Itoa(outputPos))
+				// fmt.Println(strconv.Itoa(instruction) + ": add " + strconv.Itoa(valueOne) + " and " + strconv.Itoa(valueTwo) + " output to position " + strconv.Itoa(outputPos))
 			}
 		case 2:
 			{
@@ -108,7 +105,7 @@ L:
 				product := valueOne * valueTwo
 				intcode[outputPos] = product
 				i += 4
-				fmt.Println(strconv.Itoa(instruction) + ": multiply " + strconv.Itoa(valueOne) + " and " + strconv.Itoa(valueTwo) + " output to position " + strconv.Itoa(outputPos))
+				// fmt.Println(strconv.Itoa(instruction) + ": multiply " + strconv.Itoa(valueOne) + " and " + strconv.Itoa(valueTwo) + " output to position " + strconv.Itoa(outputPos))
 			}
 		case 3:
 			{
@@ -117,7 +114,7 @@ L:
 				inputPos := intcode[i+1]
 				intcode[inputPos] = inputNumber
 				i += 2
-				fmt.Println(strconv.Itoa(instruction) + ": save " + strconv.Itoa(inputNumber) + " to position " + strconv.Itoa(inputPos))
+				// fmt.Println(strconv.Itoa(instruction) + ": save " + strconv.Itoa(inputNumber) + " to position " + strconv.Itoa(inputPos))
 			}
 		case 4:
 			{
@@ -131,12 +128,12 @@ L:
 			{
 				// jump if true (parameter, position)
 
-				if valueOne == 1 {
+				if valueOne != 0 {
 					i = valueTwo
 				} else {
 					i += 3
 				}
-				fmt.Println(strconv.Itoa(instruction) + ": jump to " + strconv.Itoa(valueTwo) + " if " + strconv.Itoa(valueOne) + " ==1 ")
+				// fmt.Println(strconv.Itoa(instruction) + ": jump to " + strconv.Itoa(valueTwo) + " if " + strconv.Itoa(valueOne) + " ==1 ")
 			}
 		case 6:
 			{
@@ -147,7 +144,7 @@ L:
 				} else {
 					i += 3
 				}
-				fmt.Println(strconv.Itoa(instruction) + ": jump to " + strconv.Itoa(valueTwo) + " if " + strconv.Itoa(valueOne) + " ==0")
+				// fmt.Println(strconv.Itoa(instruction) + ": jump to " + strconv.Itoa(valueTwo) + " if " + strconv.Itoa(valueOne) + " ==0")
 			}
 		case 7:
 			{
@@ -162,7 +159,7 @@ L:
 				}
 				i += 4
 
-				fmt.Println(strconv.Itoa(instruction) + ": set " + strconv.Itoa(outputPos) + " to 1 if " + strconv.Itoa(valueOne) + " smaller than " + strconv.Itoa(valueTwo))
+				// fmt.Println(strconv.Itoa(instruction) + ": set " + strconv.Itoa(outputPos) + " to 1 if " + strconv.Itoa(valueOne) + " smaller than " + strconv.Itoa(valueTwo))
 			}
 		case 8:
 			{
@@ -177,7 +174,7 @@ L:
 				}
 				i += 4
 
-				fmt.Println(strconv.Itoa(instruction) + ": set " + strconv.Itoa(outputPos) + " to 1 if " + strconv.Itoa(valueOne) + " equal to " + strconv.Itoa(valueTwo))
+				// fmt.Println(strconv.Itoa(instruction) + ": set " + strconv.Itoa(outputPos) + " to 1 if " + strconv.Itoa(valueOne) + " equal to " + strconv.Itoa(valueTwo))
 			}
 		case 99:
 			{
@@ -199,23 +196,28 @@ func nthDigit(number float64, base float64, n float64) int {
 
 func getValues(pointer int, intcode []int, modeOne int, modeTwo int) (int, int) {
 	var valueOne int
-	if modeOne == 0 {
-		//position
-		posOne := intcode[pointer+1]
-		valueOne = intcode[posOne]
-	} else if modeOne == 1 {
-		// immediate
-		valueOne = intcode[pointer+1]
+	var valueTwo int
+
+	if pointer < len(intcode)-2 {
+		if modeOne == 0 {
+			//position
+			posOne := intcode[pointer+1]
+			valueOne = intcode[posOne]
+		} else if modeOne == 1 {
+			// immediate
+			valueOne = intcode[pointer+1]
+		}
 	}
 
-	var valueTwo int
-	if modeTwo == 0 {
-		//position
-		posTwo := intcode[pointer+2]
-		valueTwo = intcode[posTwo]
-	} else if modeTwo == 1 {
-		// immediate
-		valueTwo = intcode[pointer+2]
+	if pointer < len(intcode)-2 {
+		if modeTwo == 0 {
+			//position
+			posTwo := intcode[pointer+2]
+			valueTwo = intcode[posTwo]
+		} else if modeTwo == 1 {
+			// immediate
+			valueTwo = intcode[pointer+2]
+		}
 	}
 
 	return valueOne, valueTwo
