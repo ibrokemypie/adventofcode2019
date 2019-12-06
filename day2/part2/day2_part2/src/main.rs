@@ -4,12 +4,13 @@ use std::io::{self, prelude::*};
 
 fn main() -> io::Result<()> {
     let args: Vec<String> = env::args().collect();
-    if args.len() != 2 {
-        println!("Must supply one argument (input file location)");
+    if args.len() != 3 {
+        println!("Must supply two arguments (input file location, desired number)");
         std::process::exit(1)
     }
 
     let input_path = &args[1];
+    let desired_num: usize = (&args[2]).parse().unwrap();
     let mut file = File::open(input_path)?;
     let mut contents = String::new();
     file.read_to_string(&mut contents)?;
@@ -20,9 +21,7 @@ fn main() -> io::Result<()> {
         .map(|x| x.parse().unwrap())
         .collect();
 
-    const DESIRED_NUM: usize = 19690720;
-
-    match test_intcode(intcode, DESIRED_NUM) {
+    match test_intcode(intcode, desired_num) {
         Some((n, v)) => println!("n = {}, v = {}, 100 * n + v = {}", n, v, 100 * n + v),
         None => println!("Failed to find combination"),
     }
