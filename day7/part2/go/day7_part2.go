@@ -42,39 +42,53 @@ func main() {
 		os.Exit(1)
 	}
 
-	phaseSequence := [5]int{}
 	intcode := parseIntcode(content)
 
 	var maxOutput int
-	for five := 5; five <= 9; five++ {
-		for four := 5; four <= 9; four++ {
-			for three := 5; three <= 9; three++ {
-				for two := 5; two <= 9; two++ {
-				loop:
-					for one := 5; one <= 9; one++ {
-						phaseSequence = [5]int{one, two, three, four, five}
-						for k1, v1 := range phaseSequence {
-							for k2, v2 := range phaseSequence {
-								if k1 != k2 && v1 == v2 {
-									continue loop
-								}
-							}
-						}
-						newOutput := trySequence(phaseSequence, intcode)
-						if newOutput > maxOutput {
-							maxOutput = newOutput
-						}
-					}
-				}
-			}
+	opts := []int{5, 6, 7, 8, 9}
+	allPermutations := permutations(opts)
+
+	for _, phaseSequence := range allPermutations {
+		newOutput := trySequence(phaseSequence, intcode)
+		if newOutput > maxOutput {
+			maxOutput = newOutput
 		}
 	}
+
 	fmt.Println(maxOutput)
 
 }
 
-func trySequence(phaseSequence [5]int, initialState []int) int {
+// https://stackoverflow.com/a/30226442
+func permutations(arr []int) [][]int {
+	var helper func([]int, int)
+	res := [][]int{}
 
+	helper = func(arr []int, n int) {
+		if n == 1 {
+			tmp := make([]int, len(arr))
+			copy(tmp, arr)
+			res = append(res, tmp)
+		} else {
+			for i := 0; i < n; i++ {
+				helper(arr, n-1)
+				if n%2 == 1 {
+					tmp := arr[i]
+					arr[i] = arr[n-1]
+					arr[n-1] = tmp
+				} else {
+					tmp := arr[0]
+					arr[0] = arr[n-1]
+					arr[n-1] = tmp
+				}
+			}
+		}
+	}
+	helper(arr, len(arr))
+	return res
+}
+
+func trySequence(phaseSequence []int, initialState []int) int {
 	channels := [5]chan int{}
 	for i := 0; i < 5; i++ {
 		channels[i] = make(chan int)
