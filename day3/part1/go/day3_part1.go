@@ -9,6 +9,11 @@ import (
 	"strings"
 )
 
+type coordinate struct {
+	x int
+	y int
+}
+
 func main() {
 	if len(os.Args) != 2 {
 		fmt.Println("Please provide one variable (input url)")
@@ -29,70 +34,66 @@ func main() {
 	instructions[0] = strings.Split(lines[0], ",")
 	instructions[1] = strings.Split(lines[1], ",")
 
-	var wires [][][2]int
+	var intersects []coordinate = getOverlappedPositions(getVisitied(instructions[0]), getVisitied(instructions[1]))
+	var distances []int = []int{}
 
-	for _, line := range instructions {
-		length := 0
-		x, y := 0, 0
-		var wire [][2]int
-
-		for _, instruction := range line {
-			direction := instruction[:1]
-			distance, _ := strconv.Atoi(instruction[1:])
-			length += distance
-
-			for i := 0; i < distance; i++ {
-				switch direction {
-				case "U":
-					{
-						y++
-					}
-				case "D":
-					{
-						y--
-					}
-				case "R":
-					{
-						x++
-					}
-				case "L":
-					{
-						x--
-					}
-				}
-				wire = append(wire, [2]int{x, y})
-			}
-
-		}
-
-		wires = append(wires, wire)
+	for _, point := range intersects {
+		distance := math.Abs(float64(0-point.x)) + math.Abs(float64(0-point.y))
+		distances = append(distances, int(distance))
 	}
 
-	var intercepts [][2]int
-
-	for _, wireOne := range wires[0] {
-		for _, wireTwo := range wires[1] {
-			if wireOne == wireTwo {
-				intercepts = append(intercepts, wireOne)
-			}
-		}
-
-	}
-
-	minDistance := float64(0)
-
-	for _, intercept := range intercepts {
-		var distance float64
-
-		distance += math.Abs(float64(intercept[0]))
-		distance += math.Abs(float64(intercept[1]))
-
-		if minDistance != 0 {
-			minDistance = math.Min(minDistance, distance)
-		} else {
-			minDistance = distance
+	var minDistance int
+	for i, e := range distances {
+		if i == 0 || e < minDistance {
+			minDistance = e
 		}
 	}
 
 	fmt.Println(minDistance)
+}
+
+func getOverlappedPositions(path1 map[string]coordinate, path2 map[string]coordinate) []coordinate {
+	var overlaps []coordinate = []coordinate{}
+
+	for key, value := range path1 {
+		if _, ok := path2[key]; ok {
+			overlaps = append(overlaps, value)
+		}
+	}
+
+	return overlaps
+}
+
+func getVisitied(line []string) map[string]coordinate {
+	var position coordinate
+	visited := make(map[string]coordinate)
+
+	for _, instruction := range line {
+		direction := instruction[:1]
+		distance, _ := strconv.Atoi(instruction[1:])
+
+		for i := 0; i < distance; i++ {
+			switch direction {
+			case "U":
+				{
+					position.y++
+				}
+			case "D":
+				{
+					position.y--
+				}
+			case "R":
+				{
+					position.x++
+				}
+			case "L":
+				{
+					position.x--
+				}
+			}
+			visited[strconv.Itoa(position.x)+" "+strconv.Itoa(position.y)] = position
+		}
+
+	}
+	return visited
 }
